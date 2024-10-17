@@ -52,7 +52,7 @@ Compile et exécute des fichiers C avec les flags -Wall -Wextra -Werror et véri
 Usage :
 - `start fichier1.c [fichier2.c ...]` : Compile et exécute les fichiers.
 - `start -c fichier1.c [fichier2.c ...]` : Compile uniquement sans exécuter.
-### Note: a revoir, elle ne marche pas avec les fichiers necessitant une librairie locale.
+### Note: A revoir, elle ne marche pas avec les fichiers necessitant une librairie locale.
 
 ## examstart
 Exécute 'make' deux fois avec une pause de 0.5 seconde entre les deux, a executer dans le dossier de lexamshell.
