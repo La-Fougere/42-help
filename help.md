@@ -31,6 +31,7 @@ Usage : `ginit <url_du_depot_distant>`
 
 ## gpush
 Effectue un add, commit et push vers les dépôts origin et github.
+#### Toujours etre dans le dossier racine du projet souhaite avant de gpush
 
 Usage : 
 - `gpush <fichier1> [fichier2] ...` : push les fichiers spécifiés.
