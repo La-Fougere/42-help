@@ -64,4 +64,4 @@ Usage : `examstart`
 Teste le projet et trouve les erreurs (norminette, make, compilation, execution). A executer dans le dossier du projet en question.
 
 Usage : `francinette` ou `paco` : Execute la francinette dans le projet du dossier actuel.
-<a href="https://github.com/WaRtr0/francinette-image?tab=readme-ov-file#francinette-install-on-42-session-ubuntu" target="_blank">Installer ici</a>
+<br><a href="https://github.com/WaRtr0/francinette-image?tab=readme-ov-file#francinette-install-on-42-session-ubuntu" target="_blank">Installer la francinette ici</a>
