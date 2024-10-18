@@ -59,3 +59,8 @@ Usage :
 Exécute 'make' deux fois avec une pause de 0.5 seconde entre les deux, a executer dans le dossier de lexamshell.
 
 Usage : `examstart`
+
+## francinette
+Teste le projet et trouve les erreurs (norminette, make, compilation, execution). A executer dans le dossier du projet en question.
+
+Usage : `francinette` ou `paco` : Execute la francinette dans le projet du dossier actuel.
