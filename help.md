@@ -35,6 +35,7 @@ Effectue un add, commit et push vers les dépôts origin et github.
 Usage : 
 - `gpush <fichier1> [fichier2] ...` : push les fichiers spécifiés.
 - `gpush <fichier1> [fichier2] ... -m "message de commit"` : Ajoute un message de commit personnalisé.
+- `gpush <fichier1> [fichier2] ... -exclude <fichier1> [fichier2] ...` : Push tout sauf les fichiers demandés
 
 ## grestore
 Recupere la backup de tous les projets realises.
