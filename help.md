@@ -1,60 +1,110 @@
-# Aide a moi meme pour mes commandes
+# Aide de mon `.zshrc`
 
-## norm
-Execute la norminette sur tous les fichiers .c et .h avec le flag -R CheckForbiddenSourceHeader.
+Ce document résume les commandes/fonctions présentes dans mon `.zshrc`.
 
-Usage :
-- `norm` : Vérifie tous les fichiers .c et .h du répertoire courant.
-- `norm file1.c file2.c` : Vérifie les fichiers spécifiés.
-- `norm -exclude test.c libft.h` : Vérifie tous les fichiers sauf ceux exclus.
+## 1) Actions automatiques au démarrage du shell
 
-## norm2
-Execute la norminette sur tous les fichiers .h avec le flag -R CheckDefine
+| Élément | Rôle |
+|---|---|
+| `custom_prompt` + `precmd` | Construit un prompt personnalisé (`user@host:path$`) avec couleurs, raccourci `~`, support chemin SFTP et alias visuel `mega`. |
+| `setxkbmap ... \| xkbcomp ...` | Recharge immédiatement le mapping clavier personnalisé (`custom`, variante `ctrl_accents`). |
+| `if [[ $PWD == /run/user/.../sftp:host=pc.teamgeek.fr,port=4339/* ]]; then ssh ...; fi` | Si le terminal est lancé dans ce montage SFTP, ouvre automatiquement une session SSH vers `pc.teamgeek.fr` (port 4339). |
+| `if [[ "$TERM_PROGRAM" != "vscode" ]]; then echo ...; fi` | Affiche un banner ASCII vert au lancement, sauf dans le terminal intégré VS Code. |
+| Rotation log bisync | Si `bisync.log` existe, conserve seulement les 5000 dernières lignes. |
+| Auto-start bisync | Lance `unison bisync -silent` au démarrage si aucun process équivalent n’est déjà actif. |
+| `compdef _bisync_completion bisync` | Active l’autocomplétion Zsh pour la commande `bisync`. |
+| `export PATH="$HOME/.local/bin:$PATH"` | Ajoute `~/.local/bin` au `PATH`. |
 
-Usage :
-- Meme fonctionnement que norm
+## 2) Alias
 
-## newfile
-Crée un nouveau fichier et l'ouvre dans une nouvelle fenetre Vim avec l'en-tête 42, les numeros de ligne et une grande taille de fenetre.
+| Alias | Équivalent | Description |
+|---|---|---|
+| `reload_keyboard` | `setxkbmap ... \| xkbcomp ...` | Recharge à la demande le layout clavier custom. |
+| `gcl` | `git clone` | Raccourci de clonage Git. |
+| `sgoinfre` | `cd /sgoinfre/goinfre/Perso/tlair` | Va directement dans ton dossier perso goinfre. |
+| `v` | `valgrind` | Lance Valgrind rapidement. |
+| `vfull` | `valgrind --leak-check=full --show-leak-kinds=all --track-fds=yes --trace-children=yes --track-origins=yes` | Profil Valgrind complet pour debug mémoire/FD/process enfants. |
+| `clear` | `/usr/bin/clear && source ~/.zshrc` | Nettoie l’écran puis recharge le `.zshrc`. |
+| `makeminishell` | `make re > /dev/null && make clean > /dev/null && ./minishell` | Recompile minishell silencieusement puis l’exécute. |
+| `cc` | `cc -Wall -Wextra -Werror` | Compilation C stricte par défaut. |
+| `gcc` | `gcc -Wall -Wextra -Werror` | Même principe mais via `gcc`. |
 
-Usage : `newfile <nom_du_fichier>`
+## 3) Fonctions utilisateur (commandes principales)
 
-## vimopen
-Ouvre un fichier existant dans Vim avec les memes parametres que newfile.
+### `help`
+- Ouvre la page d’aide distante GitHub dans le navigateur (`xdg-open`).
+- Usage: `help`
 
-Usage : `vimopen <nom_du_fichier>`
+### `bisync`
+- Pilote `unison` pour synchroniser avec le cloud `mega`.
+- Sous-commandes: `start`, `stop`, `restart`, `status`, `logs`, `help`.
+- Usage: `bisync start`
 
-## ginit
-Initialise un nouveau dépôt Git pret a utiliser avec une URL donee.
+### `maker`
+- Build `make re` en silencieux, récupère `TARGET=` dans `Makefile`, exécute le binaire, puis `make fclean`.
+- Option `-v` pour lancer via Valgrind.
+- Usage: `maker -v arg1 arg2`
 
-Usage : `ginit <url_du_depot_distant>`
+### `curlexec`
+- Télécharge un script via `curl` et l’exécute avec `bash`.
+- Usage: `curlexec https://example.com/script.sh`
 
-## gpush
-Effectue un add, commit et push vers les dépôts origin et github.
+### `test`
+- Si dossier contient `Minishell`: lance `tester.sh`.
+- Sinon, lance `test.sh` s’il existe.
+- Sinon, compile les `.c` (ou arguments fournis) avec `cc`, exécute `a.out`, puis le supprime.
+- Usage: `test` ou `test main.c utils.c`
 
-Usage : 
-- `gpush <fichier1> [fichier2] ...` : push les fichiers spécifiés.
-- `gpush <fichier1> [fichier2] ... -m "message de commit"` : Ajoute un message de commit personnalisé.
+### `ssh` (wrapper)
+- Redirige des alias courts:
+- `ssh teamgeek.fr` -> `ssh tlair@185.249.72.46`
+- `ssh pc.teamgeek.fr` -> `ssh -p 4339 tlair@pc.teamgeek.fr`
+- Sinon, comportement SSH normal.
+- Usage: `ssh teamgeek.fr`
 
-## grestore
-Recupere la backup de tous les projets realises.
+### `bigfiles`
+- Affiche le top 30 des plus gros fichiers modifiables de `~` (taille en MB).
+- Option `-supp` pour sélectionner par index puis proposer suppression.
+- Usage: `bigfiles` / `bigfiles -supp 1 2`
 
-Usage : `grestore`
+### `bigfolders`
+- Affiche le top 50 des plus gros dossiers sous `/home/tlair` (profondeur max 4).
+- Option `-supp` pour sélectionner par index puis proposer suppression récursive.
+- Garde-fou: interdit explicitement `/`, `/home`, `/home/tlair`.
+- Usage: `bigfolders` / `bigfolders -supp 1 3`
 
-## greinit
-Réinitialise un dépôt Git de projet avec une URL donee (en cas de reinstallation de backup pour le rendre pret a utiliser).
+### `spaceleft`
+- Affiche la taille de `/home/tlair` en MiB, le % d’occupation, et l’espace restant par rapport à une cible (5000 MiB par défaut).
+- Usage: `spaceleft` / `spaceleft 6000`
 
-Usage : `greinit <url_du_depot>`
+### `gpush`
+- Chaîne `git add .` -> `git commit -m "<message>"` -> `git push` avec messages d’erreur colorés en cas d’échec.
+- Usage: `gpush "feat: update parser"`
 
-## start
-Compile et exécute des fichiers C avec les flags -Wall -Wextra -Werror et vérifie la norme.
+### `setup_ssh_keys`
+- Crée `~/.ssh`, écrit une paire de clés ED25519 (privée/publique), fixe les permissions, lance `ssh-agent`, puis ajoute la clé.
+- Usage: `setup_ssh_keys`
 
-Usage :
-- `start fichier1.c [fichier2.c ...]` : Compile et exécute les fichiers.
-- `start -c fichier1.c [fichier2.c ...]` : Compile uniquement sans exécuter.
-### Note: A revoir, elle ne marche pas avec les fichiers necessitant une librairie locale.
+### `tobin`
+- Convertit des nombres décimaux en binaire via `bc`.
+- Usage: `tobin 10 42 255`
 
-## examstart
-Exécute 'make' deux fois avec une pause de 0.5 seconde entre les deux, a executer dans le dossier de lexamshell.
+### `norm`
+- Surcouche `norminette` avec options:
+- `-exclude` pour ignorer fichiers/dossiers
+- `-ok` pour cacher les lignes `OK!`
+- Si aucun fichier fourni, scan récursif des `*.c`/`*.h` (hors certains fichiers de test).
+- Affiche un résumé final (`Everything OK` / `Norm error`) + détection des globales.
+- Usage: `norm -exclude build test.c -ok`
 
-Usage : `examstart`
+### `ginit`
+- Initialise un repo Git local, configure `origin`, passe en `main`, puis pousse `main` en upstream.
+- Usage: `ginit git@github.com:user/repo.git`
+
+### `greinit`
+- Réinitialise complètement Git dans le dossier courant (`rm -rf .git` si présent), recrée le dépôt, commit initial, configure `origin`, fetch/merge `origin/main`.
+- Usage: `greinit git@github.com:user/repo.git`
+
+### `checkleaks`
+- Génère un fichier de suppressions temporaire pour Valgrind (notamment readline), lance Valgrind avec options complètes, puis supprime le fichier temporaire.
+- Usage: `checkleaks ./minishell`
